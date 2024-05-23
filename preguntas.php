@@ -1,50 +1,47 @@
-<?php 
+<?php
 session_start();
+require_once 'conexion.php';
 
-require 'conexion.php';
-
-class UserAuthentication {
+class SecurityQuestionsUpdater {
     private $pdo;
 
     public function __construct($pdo) {
         $this->pdo = $pdo;
     }
 
-    public function authenticate($user, $psw) {
-        $query = $this->pdo->prepare('SELECT * FROM administrativos WHERE user = :user AND psw = :psw');
-        $query->bindParam(':user', $user);
-        $query->bindParam(':psw', $psw);
-        $query->execute();
-
-        return $query->fetch(PDO::FETCH_ASSOC);
+    public function updateSecurityQuestions($adminId, $pregunta1, $pregunta2) {
+        $sql = $this->pdo->prepare("UPDATE administrativos SET pregunta1 = :pregunta1, pregunta2 = :pregunta2 WHERE id = :adminId");
+        $sql->bindParam(':pregunta1', $pregunta1);
+        $sql->bindParam(':pregunta2', $pregunta2);
+        $sql->bindParam(':adminId', $adminId);
+        $sql->execute();
     }
 }
 
-if (isset($_POST['aceptar'])) {
-    $user = $_POST['user'];
-    $psw = $_POST['psw'];
+if(isset($_POST['aceptar'])) {
+    // Verificar el captcha
+    // Tu código de verificación de captcha aquí...
 
-    // Obtener la conexión a la base de datos desde el archivo conexion.php
+    // Obtener el ID del administrador de la sesión
+    $adminId = $_SESSION['admin_id'];
+
+    // Obtener las respuestas a las preguntas de seguridad del formulario
+    $pregunta1 = $_POST['pregunta1'];
+    $pregunta2 = $_POST['pregunta2'];
+
+    // Obtener la conexión PDO desde el archivo de conexión
     $pdo = getConnection();
 
-    // Crear la instancia de autenticación
-    $auth = new UserAuthentication($pdo);
+    // Crear una instancia de SecurityQuestionsUpdater
+    $securityQuestionsUpdater = new SecurityQuestionsUpdater($pdo);
 
-    // Autenticar el usuario
-    $userData = $auth->authenticate($user, $psw);
+    // Actualizar las respuestas a las preguntas de seguridad en la base de datos
+    $securityQuestionsUpdater->updateSecurityQuestions($adminId, $pregunta1, $pregunta2);
 
-    if ($userData) {
-        $_SESSION['user'] = $user;
-        $_SESSION['psw'] = $psw;
-        header("Location: index.php");
-        exit;
-    } else {
-        // Aquí puedes manejar el error de autenticación
-        $error = "Usuario o contraseña incorrectos.";
-    }
+    // Redirigir a la página de login u otra página según sea necesario
+    header("location: login.php");
+    exit;
 }
-
-ob_end_flush();
 ?>
 
 <!DOCTYPE html>
@@ -52,16 +49,15 @@ ob_end_flush();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Mi Sitio</title>
+    <title>Registro - Mi Sitio</title>
     <!-- Enlace a Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.3/assets/css/docs.css" rel="stylesheet">
-    <title>Bootstrap Example</title>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="style.css">
+    <title>reCAPTCHA Example</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     <script src="//code.tidio.co/krb5ztefd2rmo7hwogvrch8fof6nvfln.js" async></script>
 
-    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -81,6 +77,7 @@ ob_end_flush();
                     <li class="nav-item">
                         <a class="nav-link" href="recuperacion.php">Recuperar Contraseña</a>
                     </li>
+                  
                 </ul>
             </div>
         </div>
@@ -89,22 +86,20 @@ ob_end_flush();
         <div class="container-form">
             <div class="form-container">
                 <div class="text-center welcome-message">
-                    <h1>Inicio de Sesion</h1>
-                    <?php if(isset($error)) { ?>
-                        <div class="alert alert-danger mt-3" role="alert">
-                            <?php echo $error; ?>
-                        </div>
-                    <?php } ?>
+                    <h1>Preguntas de seguridad</h1>
                     <form method="post">
                         <div class="mb-3">
-                            <label for="user" class="form-label">Usuario</label>
-                            <input type="text" class="form-control" id="user" name="user" placeholder="Ingresa tu Usuario">
+                            <label for="name" class="form-label">¿Cuál es tu deporte favorito?</label>
+                            <input type="text" class="form-control" id="pregunta1" name="pregunta1" placeholder="Ingresa tu respuesta" required>
                         </div>
                         <div class="mb-3">
-                            <label for="contrasena" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" name="psw" id="psw" placeholder="Ingresa tu Contraseña">
+                            <label for="user" class="form-label">¿Cuál es tu comida favorita?</label>
+                            <input type="text" class="form-control" id="pregunta2" name="pregunta2" placeholder="Ingresa tu respuesta" required>
                         </div>
-                        <button type="submit" id="aceptar" name="aceptar" class="btn btn-primary">Iniciar Sesion</button>
+                        <div class="mb-3">
+                            <div class="g-recaptcha" data-sitekey="6LfedeQpAAAAACaGbyp2ksaKrjDi770_aFKOlJnR"></div>
+                        </div>
+                        <button type="submit" id="aceptar" name="aceptar" class="btn btn-primary">Aceptar</button>
                     </form>
                 </div>
             </div>

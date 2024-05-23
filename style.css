@@ -1,0 +1,60 @@
+        /* Estilos personalizados para el carrusel */
+        #carouselExample {
+            max-height: 550px; /* Altura máxima del carrusel */
+            overflow: hidden; /* Oculta el desbordamiento */
+        }
+
+        .carousel-item img {
+            object-fit: cover; /* Ajusta el tamaño de la imagen para cubrir completamente el contenedor */
+            height: 100%; /* Ajusta la altura de la imagen al 100% del contenedor */
+        }
+        .container-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+
+        .form-container {
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            border: 5px solid #007bff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+        }
+        .contact-form {
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #f8f9fa; /* Color de fondo más claro */
+        }
+        .container-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 80vh;
+        }
+
+        .form-container {
+            width: 500px;
+            padding: 20px;
+            border-radius: 10px;
+            border: 5px solid #007bff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #f8f9fa;
+        }
+        .error-page {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+        .help-section {
+            padding: 30px;
+            border-radius: 10px;
+            background-color: #f8f9fa; /* Color de fondo más claro */
+        }
+    
+        
